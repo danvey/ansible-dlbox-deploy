@@ -1,0 +1,5 @@
+---
+ - name: startnfsservice
+   service: name=nfs-kernel-server.service state=restarted
+ - name: startdockerservice
+   service: name=docker.service state=restarted

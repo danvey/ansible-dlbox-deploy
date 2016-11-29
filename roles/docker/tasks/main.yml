@@ -1,0 +1,40 @@
+---
+        - name: Create docker container for Sabnzbd
+          docker:
+            name: sabnzbd
+            ports: 8080:8080
+            image: linuxserver/sabnzbd
+            state: started
+            detach: yes
+            expose: 8080:8080
+            volumes:
+            - /home/kodi/sabnzbd/config:/config
+            - /mnt/mediashare:/downloads
+            - /home/kodi/sabnzbd/incomplete-downloads:/incomplete-downloads
+            env: TZ=Europe/Oslo, PGID=1040, PUID=1040
+        - name: Create docker container for Sickbeard
+          docker:
+            name: sickbeard
+            ports: 8081:8081
+            image: linuxserver/sickbeard
+            state: started
+            detach: yes
+            expose: 8081:8081
+            volumes:
+            - /home/kodi/sickbeard/config:/config
+            - /mnt/mediashare:/downloads
+            - /mnt/mediashare/TV:/TV
+            env: TZ=Europe/Oslo, PGID=1040, PUID=1040
+        - name: Create docker container for Couchpotato
+          docker:
+            name: couchpotato
+            ports: 5050:5050
+            image: linuxserver/couchpotato
+            state: started
+            detach: yes
+            expose: 5050:5050
+            volumes:
+            - /home/kodi/couchpotato:/config
+            - /home/kodi/couchpotato:/downloads
+            - /mnt/mediashare/MOVIES:/movies
+            env: TZ=Europe/Oslo, PGID=1040, PUID=1040

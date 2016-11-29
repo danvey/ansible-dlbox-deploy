@@ -1,0 +1,61 @@
+---
+        - name: Create user groups
+          group: name=docker state=present
+        - name: Create a common user
+          user: name=kodi comment="Main User" uid=1040 groups=docker append=yes shell=/bin/bash
+        - name: Create Share folder
+          file: path="/mnt/mediashare" state=directory recurse=yes
+        - name: SABNZBD - Main Folder that is needed
+          file: path=/home/kodi/sabnzbd state=directory
+        - name: SABNZBD - Create folders that is needed for application
+          file: path=/home/kodi/sabnzbd/{{ item }} state=directory recurse=yes
+          with_items:
+           - config
+           - incomplete-downloads
+        - name: COUCHPOTATO - Main Folder that is needed
+          file: path=/home/kodi/couchpotato state=directory recurse=yes
+        - name: COUCHPOTATO - Create folders that is needed for application
+          file: path=/home/kodi/couchpotato/{{ item }} state=directory recurse=yes
+          with_items:
+           - config
+           - downloads
+           - movies
+        - name: SICKBEARD - Main Folder that is needed
+          file: path=/home/kodi/sickbeard state=directory recurse=yes
+        - name: SICKBEARD - Create folders that is needed for application
+          file: path=/home/kodi/sickbeard/{{ item }} state=directory recurse=yes
+          with_items:
+           - config
+           - downloads
+           - tv
+        - name: Add Signing Key for Docker Repo
+          apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D
+        - name: Add Docker Rep to packet manager
+          apt_repository: repo='deb https://apt.dockerproject.org/repo ubuntu-xenial main' update_cache=yes
+        - name: Install CA-CERTIFICATES
+          apt: name=ca-certificates state=present
+        - name: Get PIP from bootstrap
+          get_url: url=https://bootstrap.pypa.io/get-pip.py dest=/home/kodi/get-pip.py mode=0770 owner=kodi group=kodi mode=u+x
+        - name: Run PIP Installer 
+          raw: python /home/kodi/get-pip.py
+        - name: Install docker-py for docker environmnent
+          pip: state=present name=docker-py
+        - name: Install docker for Debian
+          apt: name=docker-engine update_cache=yes
+          notify:
+           - startservicedocker
+        - name: Mount External Drive on UUID
+          mount:
+            name: /mnt/mediashare
+            src: UUID=addbae69-0da3-4c4d-8a8d-a3ccceef7fad
+            fstype: ext4
+            opts: rw,relatime,seclabel
+            state: mounted
+        - name: Configure and Install NFS share
+          apt: name=nfs-kernel-server state=latest
+          notify:
+           - startnfsservice
+        - name: Configure Exports file with correct settings          
+          raw: echo "/mnt/mediashare    *(rw,sync,no_root_squash)" > /etc/exports
+        - name: Reload NFS Export file
+          raw: exportfs -r
