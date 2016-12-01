@@ -2,7 +2,7 @@
         - name: Create user groups
           group: name=docker state=present
         - name: Create a common user
-          user: name=kodi comment="Main User" uid=1040 groups=docker append=yes shell=/bin/bash
+          user: name=kodi comment="Main User" uid=1040 groups=docker,wheel append=yes shell=/bin/bash
         - name: Create Share folder
           file: path="/mnt/mediashare" state=directory recurse=yes
         - name: SABNZBD - Main Folder that is needed

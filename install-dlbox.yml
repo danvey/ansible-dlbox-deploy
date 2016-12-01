@@ -1,5 +1,9 @@
 ---
   - hosts: servername
+    remote_user: danvey
     roles:
      - common
+  - hosts: servername
+    remote_user: kodi
+    roles:
      - docker
