@@ -1,2 +1,2 @@
 # ansible-dlbox-deploy
-Just my first ansible playbook
+First ansible playbook, most likely some beginner format issues, but hopefully I will get better :-)
